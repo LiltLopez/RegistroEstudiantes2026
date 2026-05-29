@@ -31,6 +31,7 @@ public class DataLoader implements CommandLineRunner {
             guardar("Estudios Sociales");
             guardar("Inglés");
             guardar("Informática");
+            guardar("moral y civica");
 
             System.out.println("Materias cargadas correctamente");
         }

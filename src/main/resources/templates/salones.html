@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+
+    <title>Salones</title>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+          rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap"
+          rel="stylesheet">
+
+    <style>
+
+        body{
+            background:#F5F7FA;
+            font-family:'Poppins',sans-serif;
+        }
+
+        .navbar{
+            background:#2C3E50;
+            padding:14px 0;
+        }
+
+        .nav-link-custom{
+            color:#dfe6e9;
+            text-decoration:none;
+            padding:8px 14px;
+            border-radius:8px;
+        }
+
+        .nav-link-custom.active{
+            background:#6BBF59;
+            color:white;
+        }
+
+        .card{
+            border:none;
+            border-radius:16px;
+        }
+
+        .table{
+            border-radius:12px;
+            overflow:hidden;
+        }
+
+        .btn-save{
+            background:#6BBF59;
+            border:none;
+            border-radius:10px;
+            color:white;
+            padding:12px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+
+    <div class="container">
+
+        <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+            <i class="bi bi-mortarboard-fill"></i>
+            Sistema Escolar
+        </a>
+
+        <div class="d-flex gap-2 flex-wrap">
+
+            <a href="/"
+               class="nav-link-custom"
+               sec:authorize="hasRole('ADMIN')">
+
+                <i class="bi bi-people"></i>
+                Estudiantes
+
+            </a>
+
+            <a href="/notas" class="nav-link-custom">
+
+                <i class="bi bi-journal-check"></i>
+                Notas
+
+            </a>
+
+            <a href="/asistencia"
+               class="nav-link-custom"
+               sec:authorize="hasRole('ADMIN')">
+
+                <i class="bi bi-calendar-check"></i>
+                Asistencia
+
+            </a>
+
+            <a href="/fechas"
+               class="nav-link-custom"
+               sec:authorize="hasRole('ADMIN')">
+
+                <i class="bi bi-list-check"></i>
+                Fechas
+
+            </a>
+
+            <a href="/report"
+               class="nav-link-custom"
+               sec:authorize="hasRole('ADMIN')">
+
+                <i class="bi bi-bar-chart-line"></i>
+                Reportes
+
+            </a>
+
+            <a href="/logout" class="nav-link-custom">
+
+                <i class="bi bi-box-arrow-right"></i>
+                Cerrar sesión
+
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+<div class="container mt-5">
+
+    <div class="card shadow-sm p-4">
+
+        <h2 class="text-center mb-4">
+
+            Salón
+            <span th:text="${grado}"></span>°
+            <span th:text="${seccion}"></span>
+
+        </h2>
+
+        <form th:action="@{/guardarAsistenciaSalon}"
+              method="post">
+
+            <input type="hidden"
+                   name="grado"
+                   th:value="${grado}">
+
+            <input type="hidden"
+                   name="seccion"
+                   th:value="${seccion}">
+
+
+
+            <table class="table table-bordered table-hover">
+
+                <thead class="table-dark">
+
+                <tr>
+
+                    <th>Alumno</th>
+                    <th>Estado</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                <tr th:each="student : ${students}">
+
+                    <td th:text="${student.name}">
+                    </td>
+
+                    <td>
+
+                        <select class="form-select"
+                                th:name="'estado_' + ${student.id}">
+
+                            <option value="Presente">
+                                Presente
+                            </option>
+
+                            <option value="Ausente">
+                                Ausente
+                            </option>
+
+                        </select>
+
+                    </td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+            <div class="d-grid mt-4">
+
+                <button type="submit"
+                        class="btn-save">
+
+                    Guardar Asistencia
+
+                </button>
+
+            </div>
+
+        </form>
+        <div class="mb-4">
+
+            <h5>Agregar Estudiante</h5>
+
+            <form th:action="@{/salon/agregar}" method="post">
+
+                <input type="hidden" name="grade" th:value="${grado}">
+                <input type="hidden" name="section" th:value="${seccion}">
+
+                <div class="row">
+
+                    <div class="col-md-8">
+
+                        <input type="text"
+                               name="nombre"
+                               class="form-control"
+                               placeholder="Nombre del estudiante"
+                               required>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <button class="btn btn-success w-100">
+                            Agregar
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+
+    <title>Registro de Notas</title>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap"
+          rel="stylesheet">
+
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+          rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
+          rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+          rel="stylesheet">
+
+    <style>
+
+        body {
+            background: #F5F7FA;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* NAVBAR */
+
+        .navbar {
+            background: #2C3E50;
+            padding: 14px 0;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .nav-link-custom {
+            color: #dfe6e9;
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: 0.2s;
+            font-size: 0.92rem;
+        }
+
+        .nav-link-custom:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-link-custom.active {
+            background: #6BBF59;
+            color: white;
+        }
+
+        .card {
+            border: none;
+            border-radius: 14px;
+        }
+
+        .btn-save {
+            background: #6BBF59;
+            color: white;
+            border: none;
+            font-weight: 500;
+        }
+
+        .btn-save:hover {
+            background: #5aa94b;
+            color: white;
+        }
+
+        .table thead {
+            background: #4F6D7A;
+            color: white;
+        }
+
+        .title-page {
+            font-weight: 600;
+            color: #4F6D7A;
+        }
+
+        .select2-container {
+            width: 100% !important;
+        }
+
+        .select2-error .select2-selection {
+            border-color: #dc3545 !important;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+
+    <div class="container">
+
+        <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+            <i class="bi bi-mortarboard-fill"></i>
+            Sistema Escolar
+        </a>
+
+        <div class="d-flex gap-2 flex-wrap">
+
+            <a href="/"
+               class="nav-link-custom"
+               sec:authorize="hasRole('ADMIN')">
+
+                <i class="bi bi-people"></i>
+                Estudiantes
+
+            </a>
+
+            <a href="/notas"
+               class="nav-link-custom active">
+
+                <i class="bi bi-journal-check"></i>
+                Notas
+
+            </a>
+
+            <a href="/actividades"
+               class="nav-link-custom"
+               sec:authorize="hasRole('ADMIN')">
+
+                <i class="bi bi-list-task"></i>
+                Actividades
+
+            </a>
+
+            <a href="/asistencia"
+               class="nav-link-custom"
+               sec:authorize="hasRole('ADMIN')">
+
+                <i class="bi bi-calendar-check"></i>
+                Asistencia
+
+            </a>
+
+            <a href="/fechas"
+               class="nav-link-custom"
+               sec:authorize="hasRole('ADMIN')">
+
+                <i class="bi bi-list-check"></i>
+                Fechas
+
+            </a>
+
+            <a href="/report"
+               class="nav-link-custom"
+               sec:authorize="hasRole('ADMIN')">
+
+                <i class="bi bi-bar-chart-line"></i>
+                Reportes
+
+            </a>
+
+            <a href="/logout"
+               class="nav-link-custom">
+
+                <i class="bi bi-box-arrow-right"></i>
+                Cerrar sesión
+
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-10">
+
+            <!-- FORMULARIO -->
+            <div sec:authorize="hasRole('ADMIN')">
+
+                <div class="card shadow">
+
+                    <div class="card-body p-4">
+
+                        <h3 class="text-center mb-4 title-page">
+                            Registro de Notas
+                        </h3>
+
+                        <form id="formNotas"
+                              th:action="@{/notas/save}"
+                              th:object="${nota}"
+                              method="post"
+                              novalidate>
+
+                            <!-- ESTUDIANTE -->
+                            <div class="mb-3">
+
+                                <label class="form-label fw-semibold">
+                                    Estudiante
+                                </label>
+
+                                <select name="estudianteId"
+                                        id="estudianteId"
+                                        class="form-select"
+                                        required>
+
+                                    <option value="">
+                                        Seleccione un estudiante
+                                    </option>
+
+                                    <option th:each="student : ${students}"
+                                            th:value="${student.id}"
+                                            th:text="${student.nombres}">
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <!-- MATERIA -->
+                            <div class="mb-3">
+
+                                <label class="form-label fw-semibold">
+                                    Materia
+                                </label>
+
+                                <select name="materiaId"
+                                        id="materiaId"
+                                        class="form-select"
+                                        required>
+
+                                    <option value="">
+                                        Seleccione una materia
+                                    </option>
+
+                                    <option th:each="materia : ${materias}"
+                                            th:value="${materia.id}"
+                                            th:text="${materia.nombre}">
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <!-- ACTIVIDAD -->
+                            <div class="mb-3">
+
+                                <label class="form-label fw-semibold">
+                                    Actividad
+                                </label>
+
+                                <select name="actividadId"
+                                        id="actividadId"
+                                        class="form-select"
+                                        required>
+
+                                    <option value="">
+                                        Seleccione una actividad
+                                    </option>
+
+                                    <option th:each="actividad : ${actividades}"
+                                            th:value="${actividad.id}"
+                                            th:text="${actividad.nombre}">
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <!-- NOTA -->
+                            <div class="mb-4">
+
+                                <label class="form-label fw-semibold">
+                                    Nota
+                                </label>
+
+                                <input type="number"
+                                       step="0.01"
+                                       min="0"
+                                       max="10"
+                                       th:field="*{nota}"
+                                       id="nota"
+                                       class="form-control"
+                                       required>
+
+                                <div class="invalid-feedback">
+                                    Ingrese una nota válida (0 - 10).
+                                </div>
+
+                            </div>
+
+                            <!-- BOTON -->
+                            <div class="d-grid">
+
+                                <button type="submit"
+                                        class="btn btn-save">
+
+                                    Guardar Nota
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- TABLA -->
+            <div sec:authorize="hasAnyRole('ADMIN','USER')">
+
+                <div class="card shadow mt-4">
+
+                    <div class="card-body">
+
+                        <h5 class="mb-4">
+                            Historial de Notas
+                        </h5>
+
+                        <div class="table-responsive">
+
+                            <table class="table table-hover align-middle">
+
+                                <thead>
+
+                                <tr>
+
+                                    <th>Estudiante</th>
+                                    <th>Materia</th>
+                                    <th>Actividad</th>
+                                    <th>Nota</th>
+
+                                </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                <tr th:each="nota : ${notas}">
+
+                                    <td th:text="${nota.estudiante.nombres}">
+                                    </td>
+
+                                    <td th:text="${nota.materia.nombre}">
+                                    </td>
+
+                                    <td th:text="${nota.actividad.nombre}">
+                                    </td>
+
+                                    <td th:text="${nota.nota}">
+                                    </td>
+
+                                </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+
+        // SELECT2 ESTUDIANTE
+        $('#estudianteId').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Seleccione un estudiante',
+            allowClear: true
+        });
+
+        // SELECT2 MATERIA
+        $('#materiaId').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Seleccione una materia',
+            allowClear: true
+        });
+
+        // SELECT2 ACTIVIDAD
+        $('#actividadId').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Seleccione una actividad',
+            allowClear: true
+        });
+
+        // VALIDACION FORMULARIO
+        $('#formNotas').on('submit', function (e) {
+
+            let valido = true;
+
+            // VALIDAR ESTUDIANTE
+            if (!$('#estudianteId').val()) {
+
+                $('#estudianteId')
+                    .next('.select2-container')
+                    .find('.select2-selection')
+                    .addClass('select2-error');
+
+                valido = false;
+
+            }
+
+            // VALIDAR MATERIA
+            if (!$('#materiaId').val()) {
+
+                $('#materiaId')
+                    .next('.select2-container')
+                    .find('.select2-selection')
+                    .addClass('select2-error');
+
+                valido = false;
+
+            }
+
+            // VALIDAR ACTIVIDAD
+            if (!$('#actividadId').val()) {
+
+                $('#actividadId')
+                    .next('.select2-container')
+                    .find('.select2-selection')
+                    .addClass('select2-error');
+
+                valido = false;
+
+            }
+
+            // VALIDAR NOTA
+            const nota = parseFloat($('#nota').val());
+
+            if (isNaN(nota) || nota < 0 || nota > 10) {
+
+                $('#nota').addClass('is-invalid');
+
+                valido = false;
+
+            } else {
+
+                $('#nota')
+                    .removeClass('is-invalid')
+                    .addClass('is-valid');
+
+            }
+
+            if (!valido) {
+                e.preventDefault();
+            }
+
+        });
+
+        // VALIDACION EN TIEMPO REAL
+        $('#nota').on('input', function () {
+
+            const valor = parseFloat($(this).val());
+
+            if (!isNaN(valor) && valor >= 0 && valor <= 10) {
+
+                $(this)
+                    .removeClass('is-invalid')
+                    .addClass('is-valid');
+
+            } else {
+
+                $(this)
+                    .addClass('is-invalid')
+                    .removeClass('is-valid');
+
+            }
+
+        });
+
+    });
+
+</script>
+
+</body>
+
+</html>
